@@ -144,6 +144,6 @@ Take a baseline installation of a Linux distribution on a virtual machine and pr
 16. Restart Apache 
   - `sudo service apache2 restart`
   
-17. Visit site at [35.167.27.204](35.167.27.204)
+17. Visit site at [http://35.167.27.204](http://35.167.27.204)
 
 **Special Thanks to *[iliketomatoes](https://github.com/iliketomatoes)* for a very helpful README**
