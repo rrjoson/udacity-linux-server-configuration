@@ -41,8 +41,6 @@ You will take a baseline installation of a Linux distribution on a virtual machi
 6. Configure key-based authentication for grader user
   - Run this command `cp /root/.ssh/authorized_keys /home/grader/.ssh/authorized_keys`
 
-Source: [Udacity Forums](https://discussions.udacity.com/t/not-able-to-login-using-grader-login/161357/3)
-
 7. Disable ssh login for root user
   - Run `sudo nano /etc/ssh/sshd_config`
   - Change `PermitRootLogin without-password` line to `PermitRootLogin no`
@@ -58,5 +56,56 @@ Source: [Udacity Forums](https://discussions.udacity.com/t/not-able-to-login-usi
   - Start the web server with `sudo service apache2 start`
 
   
+10. Clone the Catalog app from Github
+  - Install git using: `sudo apt-get install git`
+  - `cd /var/www`
+  - `sudo mkdir catalog`
+  - Change owner of the newly created catalog folder `sudo chown -R grader:grader catalog`
+  - `cd /catalog`
+  - Clone your project from github `git clone https://github.com/rrjoson/udacity-item-catalog.git catalog`
+  - Create a catalog.wsgi file, then add this inside:
+  ```
+  import sys
+  import logging
+  logging.basicConfig(stream=sys.stderr)
+  sys.path.insert(0, "/var/www/catalog/")
   
+  from catalog import app as application
+  ```
+11. Install virtual environment
+  - Install the virtual environment `sudo pip install virtualenv`
+  - Create a new virtual environment with `sudo virtualenv venv`
+  - Activate the virutal environment `source venv/bin/activate`
+  - Change permissions `sudo chmod -R 777 venv`
+
+12. Install Flask and other dependencies
+  - Install pip with `sudo apt-get install python-pip`
+  - Install Flask `pip install Flask`
+  - Install other project dependencies
   
+13. Configure and enable a new virtual host
+  - Run this: `sudo nano /etc/apache2/sites-available/catalog.conf`
+  - Paste this code: 
+  ```
+  <VirtualHost *:80>
+      ServerName 35.167.27.204
+      ServerAlias ec2-35-167-27-204.us-west-2.compute.amazonaws.com
+      ServerAdmin admin@35.167.27.204
+      WSGIDaemonProcess catalog python-path=/var/www/catalog:/var/www/catalog/venv/lib/python2.7/site-packages
+      WSGIProcessGroup catalog
+      WSGIScriptAlias / /var/www/catalog/catalog.wsgi
+      <Directory /var/www/catalog/catalog/>
+          Order allow,deny
+          Allow from all
+      </Directory>
+      Alias /static /var/www/catalog/catalog/static
+      <Directory /var/www/catalog/catalog/static/>
+          Order allow,deny
+          Allow from all
+      </Directory>
+      ErrorLog ${APACHE_LOG_DIR}/error.log
+      LogLevel warn
+      CustomLog ${APACHE_LOG_DIR}/access.log combined
+  </VirtualHost>
+  ```
+  - Enable the virtual host `sudo a2ensite catalog`
