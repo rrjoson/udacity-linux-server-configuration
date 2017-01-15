@@ -72,6 +72,8 @@ You will take a baseline installation of a Linux distribution on a virtual machi
   
   from catalog import app as application
   ```
+  - Rename application.py to __init__.py `mv application.py __init__.py`
+  
 11. Install virtual environment
   - Install the virtual environment `sudo pip install virtualenv`
   - Create a new virtual environment with `sudo virtualenv venv`
@@ -81,7 +83,7 @@ You will take a baseline installation of a Linux distribution on a virtual machi
 12. Install Flask and other dependencies
   - Install pip with `sudo apt-get install python-pip`
   - Install Flask `pip install Flask`
-  - Install other project dependencies
+  - Install other project dependencies `sudo pip install httplib2 oauth2client sqlalchemy psycopg2`
   
 13. Configure and enable a new virtual host
   - Run this: `sudo nano /etc/apache2/sites-available/catalog.conf`
@@ -109,3 +111,28 @@ You will take a baseline installation of a Linux distribution on a virtual machi
   </VirtualHost>
   ```
   - Enable the virtual host `sudo a2ensite catalog`
+
+14. Install and configure PostgreSQL
+  - `sudo apt-get install libpq-dev python-dev`
+  - `sudo apt-get install postgresql postgresql-contrib`
+  - `sudo su - postgres`
+  - `psql`
+  - `CREATE USER catalog WITH PASSWORD 'password';`
+  - `ALTER USER catalog CREATEDB;`
+  - `CREATE DATABASE catalog WITH OWNER catalog;`
+  - `\c catalog`
+  - `REVOKE ALL ON SCHEMA public FROM public;`
+  - `GRANT ALL ON SCHEMA public TO catalog;`
+  - `\q`
+  - `exit`
+  - Change create engine line in your `__init__.py` and `database_setup.py` to: 
+  `engine = create_engine('postgresql://catalog:password@localhost/catalog')`
+  - `python /var/www/catalog/catalog/database_setup.py`
+  - Make sure no remote connections to the database are allowed. Check if the contents of this file `sudo nano /etc/postgresql/9.3/main/pg_hba.conf` looks like this:
+  ```
+  local   all             postgres                                peer
+  local   all             all                                     peer
+  host    all             all             127.0.0.1/32            md5
+  host    all             all             ::1/128                 md5
+  ```
+  
