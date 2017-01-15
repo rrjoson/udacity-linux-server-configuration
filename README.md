@@ -2,7 +2,7 @@
 
 ### Project Description
 
-You will take a baseline installation of a Linux distribution on a virtual machine and prepare it to host your web applications, to include installing updates, securing it from a number of attack vectors and installing/configuring web and database servers.
+Take a baseline installation of a Linux distribution on a virtual machine and prepare it to host your web applications, to include installing updates, securing it from a number of attack vectors and installing/configuring web and database servers.
 
 - IP address: 35.167.27.204
 
@@ -71,6 +71,7 @@ You will take a baseline installation of a Linux distribution on a virtual machi
   sys.path.insert(0, "/var/www/catalog/")
   
   from catalog import app as application
+  application.secret_key = 'supersecretkey'
   ```
   - Rename application.py to __init__.py `mv application.py __init__.py`
   
@@ -83,9 +84,13 @@ You will take a baseline installation of a Linux distribution on a virtual machi
 12. Install Flask and other dependencies
   - Install pip with `sudo apt-get install python-pip`
   - Install Flask `pip install Flask`
-  - Install other project dependencies `sudo pip install httplib2 oauth2client sqlalchemy psycopg2`
+  - Install other project dependencies `sudo pip install httplib2 oauth2client sqlalchemy psycopg2 sqlalchemy_utils`
+
+13. Update path of client_secrets.json file
+  - `nano __init__.py`
+  - Change client_secrets.json path to `/var/www/catalog/catalog/client_secrets.json`
   
-13. Configure and enable a new virtual host
+14. Configure and enable a new virtual host
   - Run this: `sudo nano /etc/apache2/sites-available/catalog.conf`
   - Paste this code: 
   ```
@@ -112,7 +117,7 @@ You will take a baseline installation of a Linux distribution on a virtual machi
   ```
   - Enable the virtual host `sudo a2ensite catalog`
 
-14. Install and configure PostgreSQL
+15. Install and configure PostgreSQL
   - `sudo apt-get install libpq-dev python-dev`
   - `sudo apt-get install postgresql postgresql-contrib`
   - `sudo su - postgres`
@@ -136,3 +141,9 @@ You will take a baseline installation of a Linux distribution on a virtual machi
   host    all             all             ::1/128                 md5
   ```
   
+16. Restart Apache 
+  - `sudo service apache2 restart`
+  
+17. Visit site at [35.167.27.204](35.167.27.204)
+
+**Special Thanks to *[iliketomatoes](https://github.com/iliketomatoes)* for a very helpful README**
